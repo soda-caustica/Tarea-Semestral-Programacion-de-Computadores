@@ -8,7 +8,7 @@ int main(int argc, char** argv){
     char* map = argv[1];
     char* sprites = argv[2];
     int ghostNumber = 0;
-    pacman pacman = {0,0,0,0,'D',1,0};
+    pacman pacman = {0,0,0,0,'D',10,0};
 
     if (argc != 3){
         fprintf(stderr,"Uso: %s <mapa> <hoja de sprites>\n",argv[0]);
@@ -30,7 +30,7 @@ int main(int argc, char** argv){
             pacman.direction = c;
         }
         updateActors(&tablero,&pacman,ghosts,ghostNumber);
-        game.animationCycle = (game.animationCycle + 1) % 2;
+        game.animationCycle += 1;
 
         
     }

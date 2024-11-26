@@ -52,15 +52,23 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
 
     for(int i = 0; i < rows; i++)
         for(int j = 0; j < columns; j++){
-            if(matrix[i][j] == WALL){
-                fromRect.x = 0;
-                fromRect.y = 0;
-            } else if(matrix[i][j] == PELLET){
-                fromRect.x = RES*2;
-                fromRect.y = 0;
-            } else{
-                fromRect.x = RES;
-                fromRect.y = 0;
+            switch(matrix[i][j]){
+                case WALL:
+                    fromRect.x = 0;
+                    fromRect.y = 0;
+                    break;
+                case PELLET:
+                    fromRect.x = RES*2;
+                    fromRect.y = 0;
+                    break;
+                case POWER_PILL:
+                    fromRect.x = RES*3;
+                    fromRect.y = 0;
+                    break;
+                default:
+                    fromRect.x = RES;
+                    fromRect.y = 0;
+                    break;
             }
             toRect.y = i*RES;
             toRect.x = j*RES;
@@ -76,10 +84,17 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
     SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
     
     for(int i = 0; i < ghostNumber; i++){
-
+        
         ghost ghost = ghosts[i];
-        fromRect.x = ghost.color*RES;
-        fromRect.y = RES;
+        
+        if(pacman->boosted == 0){
+            fromRect.x = ghost.color*RES;
+            fromRect.y = RES;
+        } else {
+            fromRect.x = 4*RES;
+            fromRect.y = RES*(2 + game->animationCycle % 2 );
+        }
+        
         toRect.x = ghost.x*RES;
         toRect.y = ghost.y*RES;
 
@@ -131,7 +146,7 @@ char pollKey(){
 
 void getPacmanSprite(const pacman* pacman, SDL_Rect* rect, int animationCycle){
     int x = 0;
-    int y = RES*(2 + animationCycle);
+    int y = RES*(2 + animationCycle % 2);
     switch(pacman->direction){
         case 'A':
             x = 0;

@@ -57,8 +57,8 @@ ghost* getGhosts(tab* board, int ghostNumber){
 
 void updateActors(tab* board, pacman* pac, ghost* ghosts, int ghostNumber){
     
-    if(pacman.boosted > 0){
-            pacman.boosted -= 1
+    if(pac->boosted > 0){
+            pac->boosted -= 1;
     }
     
     int** matrix = board->tabMat;
@@ -125,6 +125,10 @@ void movePacman(const tab* board, pacman* pac){
    
     if(matrix[new_y][new_x] == PELLET){
         pac->points += 10;
+        matrix[new_y][new_x] = SPACE;
+    } else if (matrix[new_y][new_x] == POWER_PILL){
+        pac->points += 50;
+        pac->boosted = TPF*20;
         matrix[new_y][new_x] = SPACE;
     }
     if(matrix[new_y][new_x] != WALL){
