@@ -14,7 +14,7 @@ int myKeyFilter(void* userdata, SDL_Event* event){
 //recibe un tablero, un nombre y una direccion y crea una ventana con las dimensiones y la hoja de sprites correspondientes
 gameWindow createGame(char* name, char* spritePath, tab board){
 
-    SDL_Window* window = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,RES*board.ncolumns,RES*board.nrows,SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,RES*board.ncolumns,RES*(board.nrows+1),SDL_WINDOW_SHOWN);
 
     if (window == NULL){ 
         gameWindow game = {NULL,NULL,NULL,1};
@@ -23,14 +23,14 @@ gameWindow createGame(char* name, char* spritePath, tab board){
 
     SDL_Surface* winSurface = SDL_GetWindowSurface(window);
     SDL_Surface* spritesheet = SDL_LoadBMP(spritePath);
-
+    
     if(spritesheet == NULL){
         SDL_DestroyWindow(window);
         gameWindow game = {NULL,NULL,NULL,2};
         return game;
     }
 
-    gameWindow game = {window,winSurface,spritesheet,0};
+    gameWindow game = {window,winSurface,spritesheet,0,0};
 
     return game;
 }
@@ -56,7 +56,7 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
                 fromRect.x = 0;
                 fromRect.y = 0;
             } else if(matrix[i][j] == PELLET){
-                fromRect.x = RES*3;
+                fromRect.x = RES*2;
                 fromRect.y = 0;
             } else{
                 fromRect.x = RES;
@@ -68,8 +68,8 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
         }
 
     // dibujamos el pacman y los fantasmas por separado
-    fromRect.x = 2*RES;
-    fromRect.y = 0;
+    getPacmanSprite(pacman,&fromRect, game->animationCycle);
+
     toRect.x = pacman->x*RES;
     toRect.y = pacman->y*RES;
 
@@ -127,6 +127,30 @@ char pollKey(){
         
     }
     return lastKey;
+}
+
+void getPacmanSprite(const pacman* pacman, SDL_Rect* rect, int animationCycle){
+    int x = 0;
+    int y = RES*(2 + animationCycle);
+    switch(pacman->direction){
+        case 'A':
+            x = 0;
+            break;
+        case 'D':
+            x = 1;
+            break;
+        case 'W':
+            x = 2;
+            break;
+        case 'S':
+            x = 3;
+            break;
+    }
+    x = x*RES;
+
+    rect->x = x;
+    rect->y = y;
+    
 }
 
 
