@@ -14,7 +14,7 @@ int myKeyFilter(void* userdata, SDL_Event* event){
 //recibe un tablero, un nombre y una direccion y crea una ventana con las dimensiones y la hoja de sprites correspondientes
 gameWindow createGame(char* name, char* spritePath, tab board){
 
-    SDL_Window* window = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,RES*board.ncolumns,RES*(board.nrows+1),SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,RES*board.ncolumns,RES*(board.nrows+2),SDL_WINDOW_SHOWN);
 
     if (window == NULL){ 
         gameWindow game = {NULL,NULL,NULL,1};
@@ -70,16 +70,16 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
                     fromRect.y = 0;
                     break;
             }
-            toRect.y = i*RES;
-            toRect.x = j*RES;
+            toRect.y = (i+1)*RES;
+            toRect.x = (j)*RES;
             SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
         }
 
     // dibujamos el pacman y los fantasmas por separado
     getPacmanSprite(pacman,&fromRect, game->animationCycle);
 
-    toRect.x = pacman->x*RES;
-    toRect.y = pacman->y*RES;
+    toRect.x = (pacman->x)*RES;
+    toRect.y = (pacman->y+1)*RES;
 
     SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
     
@@ -95,11 +95,38 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
             fromRect.y = RES*(2 + game->animationCycle % 2 );
         }
         
-        toRect.x = ghost.x*RES;
-        toRect.y = ghost.y*RES;
+        toRect.x = (ghost.x)*RES;
+        toRect.y = (ghost.y+1)*RES;
 
         SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
     }
+
+    //dibujamos la puntuacion!!
+
+    fromRect.x = 0;
+    fromRect.y = 4*RES;
+    fromRect.w = 2*RES;
+    fromRect.h = RES;
+
+    toRect.x = 0;
+    toRect.y = 0;
+    toRect.w = 4*RES;
+    toRect.h = RES;
+
+    SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
+
+    int score = pacman->points, counter = 1;
+    
+    toRect.w = RES/2;
+    toRect.h = RES;
+    while(score > 0 && counter <= 4){
+        getNumberSprite(score%10,&fromRect);
+        toRect.x =+ 4*RES - counter*RES/2;
+        counter++;
+        score /= 10;
+        SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
+    }
+
     SDL_UpdateWindowSurface(window);
 }
 
@@ -159,7 +186,7 @@ void getPacmanSprite(const pacman* pacman, SDL_Rect* rect, int animationCycle){
             break;
         case 'S':
             x = 3;
-            break;
+               break;
     }
     x = x*RES;
 
@@ -168,4 +195,14 @@ void getPacmanSprite(const pacman* pacman, SDL_Rect* rect, int animationCycle){
     
 }
 
+void getNumberSprite(int number, SDL_Rect* rect){
+    int x = 2*RES, y = 4*RES, w = RES/2, h = RES;
+    x += (number%5)*RES/2;
+    y += (number/5)*RES;
+    rect->x = x;
+    rect->y = y;
+    rect->w = w;
+    rect->h = h;
+
+}
 

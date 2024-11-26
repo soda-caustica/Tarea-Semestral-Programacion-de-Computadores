@@ -10,4 +10,5 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
 void killGame(gameWindow* game);
 char pollKey();
 void getPacmanSprite(const pacman* pacman, SDL_Rect* rect, int animationCycle);
+void getNumberSprite(int number, SDL_Rect* rect);
 #endif
