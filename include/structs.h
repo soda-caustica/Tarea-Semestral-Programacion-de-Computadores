@@ -37,6 +37,7 @@ typedef struct{
     SDL_Surface* winSurface;
     SDL_Surface* spritesheet;
     char quitStatus;
+    int animationCycle;
 } gameWindow;
 
 #endif
