@@ -1,1 +1,6 @@
 mi_juego
+*.class
+*.pyc
+*.o
+*.out
+*.exeo
