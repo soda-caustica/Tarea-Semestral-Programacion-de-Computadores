@@ -56,6 +56,11 @@ ghost* getGhosts(tab* board, int ghostNumber){
 }
 
 void updateActors(tab* board, pacman* pac, ghost* ghosts, int ghostNumber){
+    
+    if(pacman.boosted > 0){
+            pacman.boosted -= 1
+    }
+    
     int** matrix = board->tabMat;
     clearBoard(board, ghosts, ghostNumber);
     movePacman(board, pac);
@@ -150,7 +155,7 @@ void moveGhost(const tab* board, ghost* ghost){
             break;
     }
     
-    if(matrix[new_y][new_x] != WALL){
+    if(matrix[new_y][new_x] != WALL && matrix[new_y][new_x] != GHOST){
         ghost->y = new_y;
         ghost->x = new_x;
         ghost->lastSteppedTile = matrix[new_y][new_x];
@@ -194,6 +199,7 @@ int pacmanCollide(pacman* pac, ghost* ghost, tab* board){
         return 1;
     } else {
         resetGhost(board, ghost);
+        pac->points += 500;
         return 0;
     }
 
