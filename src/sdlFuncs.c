@@ -30,7 +30,7 @@ gameWindow createGame(char* name, char* spritePath, tab board){
         return game;
     }
 
-    gameWindow game = {window,winSurface,spritesheet,0,0};
+    gameWindow game = {window,winSurface,spritesheet,0,0,TPF};
 
     return game;
 }
@@ -126,7 +126,27 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
         score /= 10;
         SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
     }
+    
+    //dibujamos las vidas
+    int lives = pacman->lives;
+    printf("%d",lives);
+    fromRect.w = RES;
 
+    toRect.w = RES;
+    toRect.x = 0;
+
+    for(int i = 0; i < 3; i++){
+        if(i < lives){
+            fromRect.x = 0;
+            fromRect.y = 3*RES;
+        } else {
+            fromRect.x = 4*RES;
+            fromRect.y = 0;
+        }
+        toRect.x = i*RES;
+        toRect.y = (rows+1)*RES;
+        SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
+    }
     SDL_UpdateWindowSurface(window);
 }
 

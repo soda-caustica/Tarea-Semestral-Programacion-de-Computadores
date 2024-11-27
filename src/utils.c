@@ -24,3 +24,12 @@ void printMatrix(const tab* board){
     }
     printf("----------------------------\n");
 }
+
+void matrixCopy(const int** src, int** dest, int f, int c){
+    for(int i = 0; i < f; i++)
+        for(int j = 0; j < c; j++)
+            dest[i][j] = src[i][j];
+
+}
+
+

@@ -6,9 +6,11 @@
 //guarda el tablero y sus dimensiones
 typedef struct{
     int** tabMat;
+    int** tabBackup;
     int nrows;
     int ncolumns;
-} tab;
+    int maxPoints;
+}tab;
 
 // las estructuras de pacman y ghost son parecidas, guardan posicion y ultima direccion, solo que el pacman guarda su punto de aparicion y el fantasma su color
 typedef struct{
@@ -22,13 +24,12 @@ typedef struct{
 } ghost;
 
 typedef struct{
-    int x;
-    int y;
-    int spawn_x;
-    int spawn_y;
+    int x, y;
+    int spawn_x, spawn_y;
     char direction;
     int boosted;
     int points;
+    int lives;
 } pacman;
 
 //guarda la ventana actual, su Surface para usar sprites, la hoja de sprites correspondiente y una variable que maneja el cierre en una estructura
@@ -38,6 +39,7 @@ typedef struct{
     SDL_Surface* spritesheet;
     char quitStatus;
     int animationCycle;
+    int TPSp;
 } gameWindow;
 
 #endif

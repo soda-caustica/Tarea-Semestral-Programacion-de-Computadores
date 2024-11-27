@@ -8,7 +8,7 @@
 //lee el archivo que guarda el mapa y almacena sus datos
 tab readBoard(char* filepath, pacman* pac, int* ghosts){
 
-    int ncolumns, nrows;
+    int ncolumns, nrows, maxPoints = 0;;
     FILE* file = fopen(filepath,"r");
 
     if(file == NULL){
@@ -20,20 +20,33 @@ tab readBoard(char* filepath, pacman* pac, int* ghosts){
     int **board = malloc(nrows * sizeof(int*));
     for(int i = 0; i < nrows; i++)
         board[i] = malloc(ncolumns * sizeof(int));
+    
+    int **copy = malloc(nrows * sizeof(int*));
+    for(int i = 0; i < nrows; i++)
+        board[i] = malloc(ncolumns * sizeof(int));
 
     for(int i = 0; i < nrows; i++)
         for(int j = 0; j < ncolumns; j++){
             fscanf(file, "%d", &board[i][j]);
-            if(board[i][j] == CHARACTER){
-                pac->spawn_y = j;
-                pac->spawn_x = i;
+            switch(board[i][j]){  
+                case CHARACTER:
+                    pac->spawn_y = j;
+                    pac->spawn_x = i;
+                    break;
+                case PELLET:
+                    maxPoints += 10;
+                    break;
+                case POWER_PILL:
+                    maxPoints += 50;
+                    break;
             }
         }
+
     pac->x = pac->spawn_x;
     pac->y = pac->spawn_y;
     fclose(file);
     
-    tab tablero = {board,nrows,ncolumns};
+    tab tablero = {board,copy,nrows,ncolumns,maxPoints};
     return tablero;
 }
 
@@ -200,6 +213,7 @@ int checkCollide(const pacman* pac, const ghost* ghosts, int ghostNumber){
 
 int pacmanCollide(pacman* pac, ghost* ghost, tab* board){
     if(!pac->boosted){
+        pac->lives -= 1;
         return 1;
     } else {
         resetGhost(board, ghost);
