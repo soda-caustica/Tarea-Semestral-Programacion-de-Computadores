@@ -1,7 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-
+//definimos todas nuestras variables fijas, TPF es el tiempo inicial por frame, este cambia dependiendo del nivel, 
+//los otros son los enteros que representan cada tipo de casilla
 #define TPF 250
 #define RES 32
 #define SPACE 0

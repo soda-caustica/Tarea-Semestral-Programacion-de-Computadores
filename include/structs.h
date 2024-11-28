@@ -11,7 +11,7 @@ typedef struct{
     int maxPoints;
 }tab;
 
-// las estructuras de pacman y ghost son parecidas, guardan posicion y ultima direccion, solo que el pacman guarda su punto de aparicion y el fantasma su color
+// las estructuras de pacman y ghost son parecidas, guardan posicion y ultima direccion, solo que cada uno tiene variables propias que se usan mas adelante
 typedef struct{
     int x, y;
     int spawn_x, spawn_y;
@@ -29,7 +29,7 @@ typedef struct{
     int lives;
 } pacman;
 
-//guarda la ventana actual, su Surface para usar sprites, la hoja de sprites correspondiente y una variable que maneja el cierre en una estructura
+//guarda la ventana actual, su Surface para usar sprites, la hoja de sprites correspondiente y una variable que maneja el cierre en una estructura, junto con el contador animationCycle y el tiempo que se espera entre frames
 typedef struct{
     SDL_Window* window;
     SDL_Surface* winSurface;

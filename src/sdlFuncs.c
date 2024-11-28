@@ -36,7 +36,7 @@ gameWindow createGame(char* name, char* spritePath, tab board){
 }
 
 
-//Esta funcion recibe un tablero y una ventana
+//Esta funcion recibe un tablero y una ventana y dibuja todos los elementos del mapa
 void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const ghost* ghosts, int ghostNumber){    
 
     int** matrix = board.tabMat;
@@ -47,9 +47,12 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
     SDL_Surface* surface = game->winSurface;
     SDL_Window* window = game->window;
 
+    //fromRect indica nuestra posicion en la hoja de sprites
+    //toRect indica una posicion en la pantalla
     SDL_Rect fromRect = {0,0,RES,RES};
     SDL_Rect toRect = {0,0,RES,RES};
 
+    //dibujamos el 99% del tablero, obteniendo cada casilla de la matriz, correspondiendola a un sprite de nuestra hoja, y copiando el sprite en la pantalla
     for(int i = 0; i < rows; i++)
         for(int j = 0; j < columns; j++){
             switch(matrix[i][j]){
@@ -75,7 +78,7 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
             SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
         }
 
-    // dibujamos el pacman y los fantasmas por separado
+    // dibujamos el pacman y los fantasmas por separado, en el caso del pacman el sprite dependera de su direccion
     getPacmanSprite(pacman,&fromRect, game->animationCycle);
 
     toRect.x = (pacman->x)*RES;
@@ -83,6 +86,7 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
 
     SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
     
+    //iteramos el arreglo de fantasmas, dibujando cada fantasma
     for(int i = 0; i < ghostNumber; i++){
         
         ghost ghost = ghosts[i];
@@ -102,6 +106,7 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
     }
 
     //dibujamos la puntuacion!!
+    //estas lineas solo obtienen el sprite en la hoja y la posicion del texto SCORE en la pantalla
 
     fromRect.x = 0;
     fromRect.y = 4*RES;
@@ -119,6 +124,8 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
     
     toRect.w = RES/2;
     toRect.h = RES;
+    //obtenemos cada digito de la puntuacion, buscamos el digito en nuestra hoja de sprites y lo copiamos en el lugar que corresponde
+    //solo dibujamos 4 digitos para ser mas accesible a tableros mas pequeños
     for(int i = 1; i < 5; i++){
         if(score > 0){
             getNumberSprite(score%10,&fromRect);
@@ -138,6 +145,7 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
     toRect.w = RES;
     toRect.x = 0;
 
+    // por cada vida dibujamos un pacman, si no entonces dibujamos un cuadrado negro
     for(int i = 0; i < 4; i++){
         if(i < lives){
             fromRect.x = 0;
@@ -152,7 +160,7 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
     }
 
     //dibujamos los niveles
-        
+    //esto solo esta encontrando el texto LEVEL: en la hoja de sprites y el lugar donde va y copiando
     fromRect.x = 0;
     fromRect.y = 5*RES;
     fromRect.w = 2*RES;
@@ -165,8 +173,10 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
 
     SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
 
+    //deducimos los niveles en base a que tan rapido va el juego
     int levels = (TPF - game->TPFp)/21 + 1;
 
+    //lo mismo que para la puntuacion, obtenemos cada digito y lo dibujamos
     toRect.w = RES/2;
     toRect.h = RES;
     for(int i = 1; i < 3; i++){
@@ -181,7 +191,7 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
         SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
     }
 
-    
+    //actualizamos la pantalla para que nuestros cambios se vean reflejados
     SDL_UpdateWindowSurface(window);
 }
 
@@ -201,22 +211,28 @@ void killGame(gameWindow* game){
 //Espera el tiempo por frame por un ingreso, registrando el ultimo ingreso que cumpla las condiciones y devolviendolo, si no hay nada regresa "C"
 char pollKey(int tpf){
     int startTime = SDL_GetTicks();
-    int timeLeft;
     char lastKey = 'C';
-    while((timeLeft = SDL_GetTicks() - startTime) < tpf){
+
+    //mientras quede tiempo (reflejado por la variable timeLeft) esperamos algun evento de ingreso (previamente filtrados)
+    while((SDL_GetTicks() - startTime) < tpf){
         SDL_Event event;
+
+        // si no hay nada en la cola, saltamos a la siguiente iteracion con la esperanza que salga algo
         if(!SDL_PollEvent(&event)){
             continue;
         }
         
+        //si el evento es un alt+f4, retornamos 'Q'
         if(event.type == SDL_QUIT){
             return 'Q';
         }
 
+        //como nuestro filtro solo permite SDL_QUIT y eventos de tecla, entonces no hay que verificar mas
+        //obtenemos la tecla presionada y su nombre, los comparamos con las teclas permitidas, y si son alguna de ellas entonces los guardamos en lastKey
         SDL_Keycode key = event.key.keysym.sym;
         const char* keyName = SDL_GetKeyName(key);
         
-        if(strcmp(keyName,"W") && strcmp(keyName,"D") && strcmp(keyName,"S") && strcmp(keyName,"A") && strcmp(keyName,"Q") && strcmp(keyName,"Q")){
+        if(strcmp(keyName,"W") && strcmp(keyName,"D") && strcmp(keyName,"S") && strcmp(keyName,"A") && strcmp(keyName,"Q")){
             continue;
         }
         
@@ -226,6 +242,8 @@ char pollKey(int tpf){
     return lastKey;
 }
 
+//dado un pacman, vemos la hoja de sprites y obtenemos el sprite dependiendo de su direccion y un contador
+//el contador es para que el pacman cicle entre 2 sprites, para que parezca que va comiendo
 void getPacmanSprite(const pacman* pacman, SDL_Rect* rect, int animationCycle){
     int x = 0;
     int y = RES*(2 + animationCycle % 2);
@@ -250,6 +268,7 @@ void getPacmanSprite(const pacman* pacman, SDL_Rect* rect, int animationCycle){
     
 }
 
+//dado un numero de 1 digito, buscamos su posicion en la hoja de sprites y la guardamos en el puntero a un SDL_Rect
 void getNumberSprite(int number, SDL_Rect* rect){
     int x = 2*RES, y = 4*RES, w = RES/2, h = RES;
     x += (number%5)*RES/2;
