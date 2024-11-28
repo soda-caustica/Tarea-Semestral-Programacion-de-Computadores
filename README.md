@@ -1,4 +1,4 @@
-# tarea-terminal
+# TAREA SEMESTRAL GRUPO 5 PROGRAMACION DE COMPUTADORES
 
 Q es para salir,
 controle con WASD
