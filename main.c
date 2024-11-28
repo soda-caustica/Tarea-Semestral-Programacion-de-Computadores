@@ -8,7 +8,7 @@ int main(int argc, char** argv){
     char* map = argv[1];
     char* sprites = argv[2];
     int ghostNumber = 0;
-    pacman pacman = {0,0,0,0,'D',10,0,3};
+    pacman pacman = {0,0,0,0,'D',0,0,3};
 
     if (argc != 3){
         fprintf(stderr,"Uso: %s <mapa> <hoja de sprites>\n",argv[0]);
@@ -28,6 +28,7 @@ int main(int argc, char** argv){
             break;
         } else {
             game.TPFp -= 21;
+            pacman.lives = 3;
             resetGame(&tablero, &pacman, ghosts, ghostNumber);
         }
 
