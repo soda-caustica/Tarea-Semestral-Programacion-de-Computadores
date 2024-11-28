@@ -8,26 +8,29 @@
 //lee el archivo que guarda el mapa y almacena sus datos
 tab readBoard(char* filepath, pacman* pac, int* ghosts){
 
-    int ncolumns, nrows, maxPoints = 0;;
+    int ncolumns, nrows, maxPoints = 0;
     FILE* file = fopen(filepath,"r");
 
     if(file == NULL){
-        tab tablero = {NULL,0,0};
+        tab tablero = {NULL,0,0,0};
         return tablero;
     }
     fscanf(file,"%d %d %d",&nrows, &ncolumns, ghosts);
 
     int **board = malloc(nrows * sizeof(int*));
-    for(int i = 0; i < nrows; i++)
-        board[i] = malloc(ncolumns * sizeof(int));
-    
     int **copy = malloc(nrows * sizeof(int*));
-    for(int i = 0; i < nrows; i++)
+    
+    for(int i = 0; i < nrows; i++){
         board[i] = malloc(ncolumns * sizeof(int));
+        copy[i] = malloc(ncolumns*sizeof(int));
+    }
+    
 
     for(int i = 0; i < nrows; i++)
         for(int j = 0; j < ncolumns; j++){
             fscanf(file, "%d", &board[i][j]);
+            copy[i][j] = board[i][j];
+
             switch(board[i][j]){  
                 case CHARACTER:
                     pac->spawn_y = j;
@@ -88,6 +91,7 @@ void updateActors(tab* board, pacman* pac, ghost* ghosts, int ghostNumber){
             }
             resetPacman(pac);
         }
+
     matrix[pac->y][pac->x] = CHARACTER;
     for(int i = 0; i < ghostNumber; i++)
         matrix[ghosts[i].y][ghosts[i].x] = GHOST;
@@ -141,7 +145,7 @@ void movePacman(const tab* board, pacman* pac){
         matrix[new_y][new_x] = SPACE;
     } else if (matrix[new_y][new_x] == POWER_PILL){
         pac->points += 50;
-        pac->boosted = TPF*20;
+        pac->boosted = 10*1000/TPF;
         matrix[new_y][new_x] = SPACE;
     }
     if(matrix[new_y][new_x] != WALL){
@@ -188,6 +192,7 @@ void moveGhosts(tab* board, ghost* ghosts, int ghostNumber){
         }
 }
 
+
 void resetGhost(tab* board,ghost* ghost){
     ghost->x = ghost->spawn_x;
     ghost->y = ghost->spawn_y;
@@ -223,13 +228,55 @@ int pacmanCollide(pacman* pac, ghost* ghost, tab* board){
 
 }
 
+void resetGame(tab* board, pacman* pacman, ghost* ghosts, int ghostNumber){
+    int** matrix = board->tabMat;
+    int** backup = board->tabBackup;
+    int columns = board->ncolumns, rows = board->nrows;
+    
+    printf("resetting");
+    matrixCopy(backup,matrix,rows,columns);
+
+    printMatrix(board);
+
+    pacman->x = pacman->spawn_x;
+    pacman->y = pacman->spawn_y;
+    pacman->points = 0;
+    for(int i = 0; i < ghostNumber; i++){
+        ghost ghost = ghosts[i];
+        ghost.x = ghost.spawn_x;
+        ghost.y = ghost.spawn_y;
+    }
+
+}
+
 void killBoard(tab* board){
     int** matrix = board->tabMat;
+    int** copy = board->tabBackup;
     int nrows = board-> nrows;
+    
     for(int i = 0; i < nrows; i++)
         free(matrix[i]);
     free(matrix);
+
+    for(int i = 0; i < nrows; i++)
+        free(copy[i]);
+    free(copy);
+    
     board->tabMat = NULL;
+    board->tabBackup = NULL;
     board->ncolumns = 0;
     board->nrows = 0;
 }
+
+int hasPointsLeft(tab* tablero){
+    int** board = tablero->tabMat;
+    for(int i = 0; i < tablero->nrows; i++){
+        for(int j = 0; j < tablero->ncolumns; j++){
+            if(board[i][j] == PELLET || board[i][j] == POWER_PILL){
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+

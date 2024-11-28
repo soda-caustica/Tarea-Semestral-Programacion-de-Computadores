@@ -17,4 +17,6 @@ void resetPacman(pacman* pac);
 int checkCollide(const pacman* pac, const ghost* ghosts, int ghostNumber);
 int pacmanCollide(pacman* pac, ghost* ghost, tab* board);
 void killBoard(tab* board);
+void resetGame(tab* tablero, pacman* pacman, ghost* ghosts, int ghostNumber);
+int hasPointsLeft(tab* tablero);
 #endif

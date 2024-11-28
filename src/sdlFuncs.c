@@ -115,27 +115,30 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
 
     SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
 
-    int score = pacman->points, counter = 1;
+    int score = pacman->points;
     
     toRect.w = RES/2;
     toRect.h = RES;
-    while(score > 0 && counter <= 4){
-        getNumberSprite(score%10,&fromRect);
-        toRect.x =+ 4*RES - counter*RES/2;
-        counter++;
-        score /= 10;
+    for(int i = 1; i < 5; i++){
+        if(score > 0){
+            getNumberSprite(score%10,&fromRect);
+            score /= 10;
+        } else {
+            fromRect.x = 4*RES;
+            fromRect.y = 0;
+        }
+        toRect.x =+ 4*RES - i*RES/2;
         SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
     }
     
     //dibujamos las vidas
     int lives = pacman->lives;
-    printf("%d",lives);
     fromRect.w = RES;
 
     toRect.w = RES;
     toRect.x = 0;
 
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < 4; i++){
         if(i < lives){
             fromRect.x = 0;
             fromRect.y = 3*RES;
@@ -147,6 +150,38 @@ void blitBoard(tab board, const gameWindow* game, const pacman* pacman, const gh
         toRect.y = (rows+1)*RES;
         SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
     }
+
+    //dibujamos los niveles
+        
+    fromRect.x = 0;
+    fromRect.y = 5*RES;
+    fromRect.w = 2*RES;
+    fromRect.h = RES;
+
+    toRect.x = (columns-3)*RES;
+    toRect.y = 0;
+    toRect.w = 4*RES;
+    toRect.h = RES;
+
+    SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
+
+    int levels = (TPF - game->TPFp)/21 + 1;
+
+    toRect.w = RES/2;
+    toRect.h = RES;
+    for(int i = 1; i < 3; i++){
+        if(levels> 0){
+            getNumberSprite(levels%10,&fromRect);
+            levels /= 10;
+        } else {
+            fromRect.x = 4*RES;
+            fromRect.y = 0;
+        }
+        toRect.x = (columns)*RES - i*RES/2;
+        SDL_BlitSurface(sheet, &fromRect, surface, &toRect);
+    }
+
+    
     SDL_UpdateWindowSurface(window);
 }
 
@@ -164,11 +199,11 @@ void killGame(gameWindow* game){
 }
 
 //Espera el tiempo por frame por un ingreso, registrando el ultimo ingreso que cumpla las condiciones y devolviendolo, si no hay nada regresa "C"
-char pollKey(){
+char pollKey(int tpf){
     int startTime = SDL_GetTicks();
     int timeLeft;
     char lastKey = 'C';
-    while((timeLeft = SDL_GetTicks() - startTime) < TPF){
+    while((timeLeft = SDL_GetTicks() - startTime) < tpf){
         SDL_Event event;
         if(!SDL_PollEvent(&event)){
             continue;
@@ -181,7 +216,7 @@ char pollKey(){
         SDL_Keycode key = event.key.keysym.sym;
         const char* keyName = SDL_GetKeyName(key);
         
-        if(strcmp(keyName,"W") && strcmp(keyName,"D") && strcmp(keyName,"S") && strcmp(keyName,"A")){
+        if(strcmp(keyName,"W") && strcmp(keyName,"D") && strcmp(keyName,"S") && strcmp(keyName,"A") && strcmp(keyName,"Q") && strcmp(keyName,"Q")){
             continue;
         }
         

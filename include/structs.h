@@ -7,17 +7,14 @@
 typedef struct{
     int** tabMat;
     int** tabBackup;
-    int nrows;
-    int ncolumns;
+    int nrows, ncolumns;
     int maxPoints;
 }tab;
 
 // las estructuras de pacman y ghost son parecidas, guardan posicion y ultima direccion, solo que el pacman guarda su punto de aparicion y el fantasma su color
 typedef struct{
-    int x;
-    int y;
-    int spawn_x;
-    int spawn_y;
+    int x, y;
+    int spawn_x, spawn_y;
     int color;
     char direction;
     int lastSteppedTile;
@@ -39,7 +36,7 @@ typedef struct{
     SDL_Surface* spritesheet;
     char quitStatus;
     int animationCycle;
-    int TPSp;
+    int TPFp;
 } gameWindow;
 
 #endif

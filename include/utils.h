@@ -16,6 +16,6 @@
 int eucmod(int a, int b);
 char randDir();
 void printMatrix(const tab* board);
-void matrixCopy(const int** src, int** dest, int f, int c);
+void matrixCopy(int** src, int** dest, int f, int c);
 int gameLoop(gameWindow* game, tab* tablero, pacman* pacman, ghost* ghosts, int ghostNumber);
 #endif
